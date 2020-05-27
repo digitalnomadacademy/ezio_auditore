@@ -31,6 +31,7 @@ class VideoEditor {
 
     final script = "-y -i " +
         videoPath +
+        " " +
         codecConfig.encodingOptions +
         " " +
         "-c:v " +

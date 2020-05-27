@@ -59,7 +59,7 @@ class _ExamplePageState extends State<ExamplePage> {
               onPressed: () async {
                 final videoEditor = VideoEditor();
                 final result =
-                    await videoEditor.encodeVideo(videoPath, Codec.x264);
+                    await videoEditor.encodeVideo(videoPath, Codec.x265);
 
                 var message = '';
                 if (result == 0) {
