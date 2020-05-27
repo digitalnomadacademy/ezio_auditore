@@ -25,18 +25,20 @@ class VideoEditor {
   Future<int> encodeVideo(String videoPath, Codec codec) async {
     //Get temp file path
     var tempDir = await getTemporaryDirectory();
-    final tempPath = '${tempDir.path}temp.mp4';
+    final tempPath = '${tempDir.path}/temp.mp4';
 
     final codecConfig = _getCodecConfig(codec);
 
     final script = "-y -i " +
         videoPath +
-        " -filter:v " +
         codecConfig.encodingOptions +
+        " " +
         "-c:v " +
         codecConfig.libraryName +
         " -r 30 " +
         tempPath;
+
+    print(script);
 
     return _flutterFFmpeg.execute(script);
   }
