@@ -1,8 +1,9 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttervideoeditor/codecs.dart';
 import 'package:fluttervideoeditor/fluttervideoeditor.dart';
+import 'package:fluttervideoeditor/videoutil.dart';
 
 void main() {
   runApp(MyApp());
@@ -73,6 +74,18 @@ class _ExamplePageState extends State<ExamplePage> {
                 });
               },
             ),
+            FlatButton(
+              child: Text('Get Media Info'),
+              onPressed: () async {
+                final util = VideoUtil();
+                final result =
+                await util.getVideoInfo(videoPath);
+                print(result);
+
+
+              },
+            ),
+
             Text(encodeMessage),
           ],
         ),
