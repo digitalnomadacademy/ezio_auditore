@@ -13,11 +13,11 @@ class VideoEditor {
   CodecConfig _getCodecConfig(Codec codec) {
     switch (codec) {
       case Codec.x264:
-        return CodecConfig(libraryName: 'libx264', encodingOptions: '');
+        return CodecConfig(libraryName: 'libx264', encodingOptions: '-crf 27 -preset veryfast ');
 
       case Codec.x265:
         return CodecConfig(
-            libraryName: 'libx265', encodingOptions: '-crf 28 -preset fast ');
+            libraryName: 'libx265', encodingOptions: '-crf 28 -preset veryfast ');
     }
   }
 
