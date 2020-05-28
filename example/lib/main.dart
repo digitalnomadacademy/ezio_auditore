@@ -58,8 +58,8 @@ class _ExamplePageState extends State<ExamplePage> {
               child: Text('Encode with hevc'),
               onPressed: () async {
                 final videoEditor = VideoEditor();
-                final result =
-                    await videoEditor.encodeVideo(videoPath, Codec.x265);
+                Stopwatch stopwatch =  Stopwatch()..start();
+                final result =  await videoEditor.encodeVideo(videoPath, Codec.x264);
 
                 var message = '';
                 if (result == 0) {
@@ -69,7 +69,7 @@ class _ExamplePageState extends State<ExamplePage> {
                 }
 
                 setState(() {
-                  encodeMessage = message;
+                  encodeMessage = message + "Encode time : ${stopwatch.elapsed.inMilliseconds}";
                 });
               },
             ),
