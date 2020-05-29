@@ -1,4 +1,4 @@
-name: fluttervideoeditor
+name: flutter_video_editor
 description: An awesome video editor that works on both iOS and Android
 version: 0.0.1
 author: "Digital nomad academy"
@@ -9,7 +9,6 @@ environment:
 
 dependencies:
   flutter_ffmpeg: ^0.2.10
-  path_provider: ^1.6.9
   flutter:
     sdk: flutter
 

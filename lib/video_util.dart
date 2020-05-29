@@ -17,25 +17,30 @@ class VideoUtil {
 }
 
 class VideoInfo {
-  final int width, height, bitrate, duration;
+  final int width;
+  final int height;
+  final int bitrate;
+  final int duration;
   final Codec codec;
   final bool isVertical;
-  final double framerate, filesize;
+  final double frameRate;
+  final double fileSize;
+
   const VideoInfo({
     @required this.width,
     @required this.height,
     @required this.bitrate,
     @required this.duration,
     @required this.codec,
-    @required this.framerate,
+    @required this.frameRate,
     @required this.isVertical,
-    @required this.filesize,
+    @required this.fileSize,
   });
 
   factory VideoInfo.fromMap(Map<dynamic, dynamic> map, size) {
     debugPrint(map.toString());
     return VideoInfo(
-      filesize: size / 1000.0,
+      fileSize: size / 1000.0,
       duration: map['duration'] as int,
       width: map['streams'][0]['width'] as int,
       height: map['streams'][0]['height'] as int,
@@ -46,12 +51,12 @@ class VideoInfo {
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
               ? Codec.x264
               : Codec.x265,
-      framerate: double.parse(map['streams'][0]['realFrameRate']),
+      frameRate: double.parse(map['streams'][0]['realFrameRate']),
     );
   }
 
   @override
   String toString() {
-    return 'Info{width: $width, height: $height, bitrate: $bitrate, duration: $duration, codec: $codec, isVertical: $isVertical, framerate: $framerate, filesize: $filesize}';
+    return 'Info{width: $width, height: $height, bitrate: $bitrate, duration: $duration, codec: $codec, isVertical: $isVertical, frameRate: $frameRate, fileSize: $fileSize}';
   }
 }
