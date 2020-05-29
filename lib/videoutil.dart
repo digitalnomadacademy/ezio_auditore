@@ -8,20 +8,20 @@ import 'codecs.dart';
 class VideoUtil {
   final FlutterFFprobe _flutterFFprobe = FlutterFFprobe();
 
-  Future<Info> getVideoInfo(String path) async {
+  Future<VideoInfo> getVideoInfo(String path) async {
     final info = await _flutterFFprobe.getMediaInformation(path);
     final tmpFile = File(path);
     var size = await tmpFile.length();
-    return Info.fromMap(info, size);
+    return VideoInfo.fromMap(info, size);
   }
 }
 
-class Info {
+class VideoInfo {
   final int width, height, bitrate, duration;
   final Codec codec;
   final bool isVertical;
   final double framerate, filesize;
-  const Info({
+  const VideoInfo({
     @required this.width,
     @required this.height,
     @required this.bitrate,
@@ -32,9 +32,9 @@ class Info {
     @required this.filesize,
   });
 
-  factory Info.fromMap(Map<dynamic, dynamic> map, size) {
+  factory VideoInfo.fromMap(Map<dynamic, dynamic> map, size) {
     debugPrint(map.toString());
-    return Info(
+    return VideoInfo(
       filesize: size / 1000.0,
       duration: map['duration'] as int,
       width: map['streams'][0]['width'] as int,
