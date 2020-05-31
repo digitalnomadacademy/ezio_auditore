@@ -1,4 +1,4 @@
-enum Codec { x264, x265 }
+enum VideoCodec { x264, x265 }
 
 class CodecConfig {
   final String libraryName;

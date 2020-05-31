@@ -18,7 +18,7 @@ class VideoUtil {
 
 class VideoInfo {
   final int width, height, bitrate, duration;
-  final Codec codec;
+  final VideoCodec codec;
   final bool isVertical;
   final double framerate, filesize;
   const VideoInfo({
@@ -44,8 +44,8 @@ class VideoInfo {
       bitrate: map['streams'][0]['bitrate'] as int,
       codec:
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
-              ? Codec.x264
-              : Codec.x265,
+              ? VideoCodec.x264
+              : VideoCodec.x265,
       framerate: double.parse(map['streams'][0]['realFrameRate']),
     );
   }
