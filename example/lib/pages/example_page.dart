@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttervideoeditor/codecs.dart';
-import 'package:fluttervideoeditor/fluttervideoeditor.dart';
-import 'package:fluttervideoeditor/videoutil.dart';
+import 'package:flutter_video_editor/codecs.dart';
+import 'package:flutter_video_editor/flutter_video_editor.dart';
+import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/constants/presets.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ExamplePage extends StatefulWidget {
   @override
@@ -39,23 +41,31 @@ class _ExamplePageState extends State<ExamplePage> {
               },
             ),
             FlatButton(
-              child: Text('Encode with hevc'),
+              child: Text('Encode'),
               onPressed: () async {
                 final videoEditor = VideoEditor();
+
+                //Get temp file path
+                var tempDir = await getTemporaryDirectory();
+                final tempPath = '${tempDir.path}/temp.mp4';
+
                 Stopwatch stopwatch = Stopwatch()..start();
-                final result =
-                    await videoEditor.encodeVideo(videoPath, VideoCodec.x264);
+                final result = await videoEditor.encodeVideo(
+                  videoPath: videoPath,
+                  codec: VideoCodec.x264,
+                  outputPath: tempPath,
+                  preset: Preset.veryFast,
+                );
 
                 var message = '';
-                if (result == 0) {
+                if (result == VideoOutputState.success) {
                   message = 'Encoding success';
                 } else {
                   message = 'Encoding failed with result code: $result';
                 }
-
                 setState(() {
                   encodeMessage = message +
-                      "Encode time : ${stopwatch.elapsed.inMilliseconds}";
+                      "\nEncode time : ${stopwatch.elapsed.inSeconds} seconds";
                 });
               },
             ),

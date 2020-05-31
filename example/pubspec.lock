@@ -95,7 +95,7 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fluttervideoeditor:
+  flutter_video_editor:
     dependency: "direct main"
     description:
       path: ".."
@@ -152,7 +152,7 @@ packages:
     source: hosted
     version: "1.6.4"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
