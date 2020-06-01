@@ -1,5 +1,8 @@
 library flutter_video_editor;
 
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/codecs.dart';
@@ -7,6 +10,7 @@ import 'package:flutter_video_editor/constants/library_names.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/encoding_options.dart';
 import 'package:flutter_video_editor/exceptions.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Enums to represent different states of video output functions
 enum VideoOutputState {
@@ -40,7 +44,7 @@ class VideoEditor {
 
   /// Function to encode a given video file with the required codec
   Future<VideoOutputState> encodeVideo(
-      {@required String videoPath,
+      {@required var videoPath,
       @required String outputPath,
       VideoCodec codec = VideoCodec.x264,
       int crf = 27,
@@ -51,9 +55,21 @@ class VideoEditor {
     }
 
     final codecConfig = _getCodecConfig(codec, crf, preset);
+    final Directory directory = await getApplicationDocumentsDirectory();
+     String output;
+    if (videoPath is List && videoPath.length > 1) {
+      var file = File('${directory.path}/paths.txt');
+      String text ="";
+      videoPath.forEach((el){
+        text+="file $el\n";
+      });
+     await file.writeAsString(text);
+     output = file.path;
+    } else
+      output = videoPath.first;
 
     final script = _buildScript(
-        videoPath: videoPath,
+        videoPath: output,
         outputPath: outputPath,
         codecConfig: codecConfig,
         outputRate: 30);
@@ -66,6 +82,7 @@ class VideoEditor {
 
     return VideoOutputState.failure;
   }
+
 
   // Todo: Build this method along as we add more functionality
   /// Private function to help generate scripts for ffmpeg
@@ -86,7 +103,7 @@ class VideoEditor {
     }
 
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
-    return "-y -i " +
+    return "-y ${videoPath.contains('txt')?"-f concat -safe 0":""} -i " +
         videoPath +
         " " +
         _codecConfig.encodingOptions +
