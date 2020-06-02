@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/video_util.dart';
 import 'package:flutter_video_editor/flutter_video_editor.dart';
-import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
@@ -62,16 +61,13 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
               onPressed: () async {
                 var tempDir = await getApplicationDocumentsDirectory();
 
-                final tempPath =  '${tempDir.path}/temp.mp4'  ;
+                final tempPath = '${tempDir.path}/temp.mp4';
 
-
-                await videoEditor.encodeVideo(
-                  videoPath: [video_1_path, video_2_path],
-                  codec: VideoCodec.x264,
-                  outputPath: tempPath,
-                  preset: Preset.veryFast,
-                );
-                  GallerySaver.saveVideo(tempPath).then((value) => print);
+                await videoEditor.combineVideos(
+                    videoPaths: [video_1_path, video_2_path],
+                    outputPath: tempPath,
+                    preset: Preset.superFast);
+                GallerySaver.saveVideo(tempPath).then((value) => print);
               },
             )
           ],
