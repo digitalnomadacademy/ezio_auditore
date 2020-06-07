@@ -28,9 +28,11 @@ class _CameraExampleState extends State<CameraExample>
     if (controller == null || !controller.value.isInitialized) {
       return;
     }
+
     if (state == AppLifecycleState.inactive) {
       controller?.dispose();
     } else if (state == AppLifecycleState.resumed) {
+      print("Controller State: ${controller != null}");
       if (controller != null) {
         setState(() {});
       }
@@ -38,10 +40,13 @@ class _CameraExampleState extends State<CameraExample>
   }
 
   Future<void> _initCamera() async {
-    final cameraDescription = await VideoRecorderInitializer.initialize();
+    //If controller is disposed in case of inactivity, controller would have to be initialized again
+    if (controller == null || controller.isDisposed) {
+      final cameraDescription = await VideoRecorderInitializer.initialize();
 
-    controller = VideoRecorderController(cameraDescription: cameraDescription);
-
+      controller =
+          VideoRecorderController(cameraDescription: cameraDescription);
+    }
     return controller.initialize();
   }
 
@@ -70,13 +75,28 @@ class _CameraExampleState extends State<CameraExample>
                 ),
               ),
             ),
-            Row(
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.switch_camera),
-                  onPressed: () {},
-                )
-              ],
+            Positioned(
+              bottom: 32,
+              left: 16,
+              right: 16,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      Icons.switch_camera,
+                      color: Colors.white,
+                    ),
+                    onPressed: () async {
+                      try {
+                        controller = await controller.switchCamera();
+                      } catch (e) {}
+                      setState(() {});
+                    },
+                  )
+                ],
+              ),
             )
           ],
         ),
