@@ -1,3 +1,4 @@
+import 'package:example/pages/camera_example.dart';
 import 'package:example/pages/example_page.dart';
 import 'package:flutter/material.dart';
 
@@ -11,11 +12,12 @@ String initialRoute = RouteName.testPage;
 class RouteName {
   static const String home = '/';
   static const String testPage = 'test';
-  
+  static const String cameraExample = 'cameraExample';
 }
 
 Map<String, WidgetBuilder> testRoutes = {
   RouteName.testPage: (context) => _TestPage(),
+  RouteName.cameraExample: (context) => CameraExample(),
 };
 
 class _TestPage extends StatelessWidget {
