@@ -97,6 +97,7 @@ class VideoEditor {
     //Our codecs match, execute script
     final script = _buildScript(
       videoPaths: videoPaths,
+      outputRate: 24,
       outputPath: outputPath,
       codec: firstCodec,
       crf: crf,
@@ -140,13 +141,16 @@ class VideoEditor {
 
       combineScript += '-filter_complex "';
       for (var i = 0; i < videoPaths.length; i++) {
-        combineScript += '[$i:v] [$i:a] ';
+        combineScript += '[$i:v]scale=720:1280:force_original_aspect_ratio=1[v$i] ';
       }
 
+      for (var i = 0; i < videoPaths.length; i++) {
+        combineScript += '[v$i][$i:a]';
+      }
       combineScript +=
-          'concat=n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
+          'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
 
-      combineScript += _codecConfig.encodingOptions + ' ';
+      combineScript += _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
 
       combineScript += outputPath;
 

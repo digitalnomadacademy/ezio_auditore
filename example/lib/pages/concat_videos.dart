@@ -21,6 +21,7 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
   final VideoUtil videoUtil = VideoUtil();
   final VideoEditor videoEditor = VideoEditor();
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +34,9 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
               child: Text('Pick video 1'),
               onPressed: () async {
                 File video = await FilePicker.getFile(
-                    type: FileType.custom, allowedExtensions: [".mp4"]);
+                  type: FileType.video,
+//                  allowedExtensions: [".mp4"],
+                );
                 final info = await videoUtil.getVideoInfo(video.path);
                 setState(() {
                   video_1 = info;
@@ -46,7 +49,10 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
               child: Text('Pick video 2'),
               onPressed: () async {
                 File video = await FilePicker.getFile(
-                    type: FileType.custom, allowedExtensions: [".mp4"]);
+                  type: FileType.video,
+                  //                  allowedExtensions: [".mp4"],
+
+                );
                 final info = await videoUtil.getVideoInfo(video.path);
 
                 setState(() {
@@ -67,7 +73,7 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                     videoPaths: [video_1_path, video_2_path],
                     outputPath: tempPath,
                     preset: Preset.superFast);
-                GallerySaver.saveVideo(tempPath).then((value) => print);
+               await GallerySaver.saveVideo(tempPath).then((value) => debugPrint("saved $value"));
               },
             )
           ],
