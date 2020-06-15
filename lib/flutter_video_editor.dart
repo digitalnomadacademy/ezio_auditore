@@ -141,7 +141,7 @@ class VideoEditor {
 
       combineScript += '-filter_complex "';
       for (var i = 0; i < videoPaths.length; i++) {
-        combineScript += '[$i:v]scale=720:1280:force_original_aspect_ratio=1[v$i] ';
+        combineScript += '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
       }
 
       for (var i = 0; i < videoPaths.length; i++) {

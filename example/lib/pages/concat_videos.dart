@@ -21,7 +21,6 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
   final VideoUtil videoUtil = VideoUtil();
   final VideoEditor videoEditor = VideoEditor();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +50,6 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                 File video = await FilePicker.getFile(
                   type: FileType.video,
                   //                  allowedExtensions: [".mp4"],
-
                 );
                 final info = await videoUtil.getVideoInfo(video.path);
 
@@ -73,7 +71,9 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                     videoPaths: [video_1_path, video_2_path],
                     outputPath: tempPath,
                     preset: Preset.superFast);
-               await GallerySaver.saveVideo(tempPath).then((value) => debugPrint("saved $value"));
+                await GallerySaver.saveVideo(tempPath,
+                        albumName: "FlutterVideoEditor")
+                    .then((value) => debugPrint("saved $value"));
               },
             )
           ],
