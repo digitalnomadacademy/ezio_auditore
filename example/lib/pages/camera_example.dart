@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/widgets/video_recorder.dart';
 
 class CameraExample extends StatefulWidget {
@@ -91,7 +92,7 @@ class _CameraExampleState extends State<CameraExample>
                     onPressed: () async {
                       try {
                         controller = await controller.switchCamera();
-                      } catch (e) {}
+                      } on NoCameraFoundException catch (e) {}
                       setState(() {});
                     },
                   )
