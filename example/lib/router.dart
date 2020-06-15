@@ -1,9 +1,12 @@
 import 'package:example/pages/camera_example.dart';
+
+import 'package:example/pages/concat_videos.dart';
 import 'package:example/pages/example_page.dart';
 import 'package:flutter/material.dart';
 
 Map<String, WidgetBuilder> routes = {
   RouteName.home: (context) => ExamplePage(),
+  RouteName.concat: (context) => ConcatVideosPage(),
   ...testRoutes
 };
 
@@ -13,6 +16,8 @@ class RouteName {
   static const String home = '/';
   static const String testPage = 'test';
   static const String cameraExample = 'cameraExample';
+  static const String concat = 'concat';
+
 }
 
 Map<String, WidgetBuilder> testRoutes = {

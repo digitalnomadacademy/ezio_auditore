@@ -9,3 +9,9 @@ class NoCameraFoundException implements Exception {
   NoCameraFoundException(this.msg);
   String toString() => 'NoCameraFoundException: $msg';
 }
+
+class CodecMismatchException implements Exception {
+  String msg;
+  CodecMismatchException(this.msg);
+  String toString() => 'CodecMismatchException: $msg';
+}
