@@ -1,6 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/widgets/video_recorder.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CameraExample extends StatefulWidget {
   @override
@@ -10,6 +13,7 @@ class CameraExample extends StatefulWidget {
 class _CameraExampleState extends State<CameraExample>
     with WidgetsBindingObserver {
   VideoRecorderController controller;
+  String videoPath;
 
   @override
   void initState() {
@@ -48,6 +52,11 @@ class _CameraExampleState extends State<CameraExample>
       controller =
           VideoRecorderController(cameraDescription: cameraDescription);
     }
+
+    if (controller != null && controller.value.isInitialized) {
+      return controller;
+    }
+
     return controller.initialize();
   }
 
@@ -95,7 +104,57 @@ class _CameraExampleState extends State<CameraExample>
                       } on NoCameraFoundException catch (e) {}
                       setState(() {});
                     },
-                  )
+                  ),
+                  if (!(controller?.isRecordingVideo ?? false) &&
+                      !(controller?.isRecordingPaused ?? false))
+                    IconButton(
+                      icon: Icon(
+                        Icons.fiber_manual_record,
+                        color: Colors.redAccent,
+                      ),
+                      onPressed: () async {
+                        await onRecordVideoPressed();
+                      },
+                    ),
+                  if ((controller?.isRecordingVideo ?? false) &&
+                      !(controller?.isRecordingPaused ?? false))
+                    IconButton(
+                      icon: Icon(
+                        Icons.pause_circle_outline,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        onPauseVideoPressed();
+                      },
+                    ),
+                  if ((controller?.isRecordingVideo ?? false) &&
+                      (controller?.isRecordingPaused ?? false))
+                    IconButton(
+                      icon: Icon(
+                        Icons.pause_circle_filled,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        onResumeVideoPressed();
+                      },
+                    ),
+                  if (controller?.isRecordingVideo ?? false)
+                    IconButton(
+                      icon: Icon(
+                        Icons.stop,
+                        color: Colors.redAccent,
+                      ),
+                      onPressed: () async {
+                        await onStopRecordingPressed();
+                        await GallerySaver.saveVideo(videoPath,
+                                albumName: "FlutterVideoRecorder")
+                            .then((value) => print("Video saved: $value"));
+
+                        print("Video saved");
+
+                        setState(() {});
+                      },
+                    )
                 ],
               ),
             )
@@ -103,5 +162,42 @@ class _CameraExampleState extends State<CameraExample>
         ),
       ),
     );
+  }
+
+  Future<String> onRecordVideoPressed() async {
+    if (controller.isRecordingVideo) {
+      return null;
+    }
+
+    //Provide a path to record video
+    var tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/${DateTime.now().toString()}.mp4';
+
+    try {
+      videoPath = filePath;
+      await controller.startVideoRecording(filePath);
+      print("Recording started");
+      setState(() {});
+    } catch (e) {
+      print("Error recording video: ${e.toString()}");
+    }
+
+    return filePath;
+  }
+
+  void onPauseVideoPressed() async {
+    await controller.pauseVideoRecording();
+    print("Recording paused");
+    setState(() {});
+  }
+
+  void onResumeVideoPressed() async {
+    await controller.resumeVideoRecording();
+    print("Recording resumed");
+    setState(() {});
+  }
+
+  Future<void> onStopRecordingPressed() async {
+    return controller.stopVideoRecording();
   }
 }

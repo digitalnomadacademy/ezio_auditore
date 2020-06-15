@@ -50,6 +50,12 @@ class VideoRecorderController extends CameraController {
     }
   }
 
+  ///Check if we are currently recording video
+  bool get isRecordingVideo => this.value.isRecordingVideo;
+
+  ///Check if current recording is paused
+  bool get isRecordingPaused => this.value.isRecordingPaused;
+
   /// Allows you to switch between front and back camera, returns a new instance of VideoRecorderController
   /// to represent the current selected camera. Throws [NoCameraFound] exception
   /// if device as 0 or only 1 camera
@@ -82,5 +88,35 @@ class VideoRecorderController extends CameraController {
     }
 
     return null;
+  }
+
+  /// Function to record videos. Requires a file path. Returns a future with
+  /// recorded video in specified file path
+  Future<void> startVideoRecording(String filePath) async {
+    return super.startVideoRecording(filePath);
+  }
+
+  /// Function to pause video recording. Returns null if no video is being recorded
+  Future<void> pauseVideoRecording() async {
+    if (!this.isRecordingVideo) {
+      return null;
+    }
+    return super.pauseVideoRecording();
+  }
+
+  /// Function to resume video recording. Returns null if no video was being recorded
+  Future<void> resumeVideoRecording() async {
+    if (!this.isRecordingVideo) {
+      return null;
+    }
+    return super.resumeVideoRecording();
+  }
+
+  /// Function to stop video recording. Returns null if no video is being recorded
+  Future<void> stopVideoRecording() async {
+    if (!this.isRecordingVideo) {
+      return null;
+    }
+    return super.stopVideoRecording();
   }
 }
