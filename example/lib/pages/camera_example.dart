@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/widgets/video_recorder.dart';
