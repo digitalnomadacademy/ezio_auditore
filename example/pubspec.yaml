@@ -23,8 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  path_provider: ^1.6.9
-  file_picker: ^1.9.0+1
+  path_provider: ^1.6.10
+  file_picker: ^1.11.0+3
   gallery_saver: 2.0.1
   flutter_video_editor:
     path: ../
