@@ -8,6 +8,7 @@ import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/encoding_options.dart';
 import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/watermark_filter.dart';
 
 /// Enums to represent different states of video output functions
 enum VideoOutputState {
@@ -40,10 +41,13 @@ class VideoEditor {
   }
 
   /// Function to encode a given video file with the required codec
+  /// Watermark if needed must be passed as absolute file path
   Future<VideoOutputState> encodeVideo(
       {@required String videoPath,
       @required String outputPath,
       VideoCodec codec = VideoCodec.x264,
+      String watermark = '',
+      WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
       int crf = 27,
       Preset preset = Preset.defaultPreset}) async {
     if (videoPath.isEmpty || outputPath.isEmpty) {
@@ -57,6 +61,8 @@ class VideoEditor {
         videoPath: videoPath,
         outputPath: outputPath,
         codecConfig: codecConfig,
+        watermark: watermark,
+        watermarkPosition: watermarkPosition,
         outputRate: 30);
 
     final executionResult = await _flutterFFmpeg.execute(script);
@@ -121,6 +127,8 @@ class VideoEditor {
     List<String> videoPaths,
     String outputPath,
     CodecConfig codecConfig,
+    String watermark = '',
+    WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
     VideoCodec codec,
     int outputRate,
     int crf,
@@ -141,7 +149,8 @@ class VideoEditor {
 
       combineScript += '-filter_complex "';
       for (var i = 0; i < videoPaths.length; i++) {
-        combineScript += '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
+        combineScript +=
+            '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
       }
 
       for (var i = 0; i < videoPaths.length; i++) {
@@ -150,22 +159,41 @@ class VideoEditor {
       combineScript +=
           'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
 
-      combineScript += _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
+      combineScript +=
+          _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
 
       combineScript += outputPath;
 
       return combineScript;
     }
+    final watermarkFilter = _watermarkInput(watermark, watermarkPosition);
 
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
     return "-y -i " +
         videoPath +
         " " +
+        watermarkFilter.input +
+        watermarkFilter.complexFilter +
         _codecConfig.encodingOptions +
         " " +
         "-c:v " +
         _codecConfig.libraryName +
         " -r $outputRate " +
         outputPath;
+  }
+
+  /// Takes absolute path of watermark and returns ffmpeg input and filter params
+  WatermarkFiler _watermarkInput(
+      String watermark, WatermarkPosition watermarkPosition,
+      {bool withFilter = true}) {
+    if (watermark.isNotEmpty) {
+      // Sets overlay to bottom right corner of screen
+      return WatermarkFiler(
+          input: '-i $watermark ',
+          complexFilter:
+              '${withFilter ? '-filter_complex ' : ''}${watermarkPosition.overlayFilterString} ');
+    }
+
+    return WatermarkFiler();
   }
 }
