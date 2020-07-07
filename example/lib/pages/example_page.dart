@@ -54,8 +54,7 @@ class _ExamplePageState extends State<ExamplePage> {
                     '${tempDir.path}/${DateTime.now().toIso8601String()}.mp4';
 
                 //Watermark
-                final watermark =
-                    await getImageFileFromAssets('assets/flutterlogo.png');
+                final watermark = await getWaterMarkPath();
 
                 Stopwatch stopwatch = Stopwatch()..start();
                 final result = await videoEditor.encodeVideo(
@@ -98,7 +97,7 @@ class _ExamplePageState extends State<ExamplePage> {
   }
 }
 
-Future<String> getImageFileFromAssets(String path) async {
+Future<String> getWaterMarkPath() async {
   //final byteData = await rootBundle.load(path);
   final tempPath = await getApplicationDocumentsDirectory();
   final imageFile = File('${tempPath.path}/watermark.png');

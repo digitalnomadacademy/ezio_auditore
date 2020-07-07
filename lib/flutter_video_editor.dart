@@ -78,6 +78,8 @@ class VideoEditor {
   Future<VideoOutputState> combineVideos(
       {@required List<String> videoPaths,
       @required String outputPath,
+      String watermark = '',
+      WatermarkPosition watermarkPosition,
       int crf = 27,
       Preset preset = Preset.defaultPreset}) async {
     if (videoPaths.length < 2 || outputPath.isEmpty) {
@@ -106,6 +108,8 @@ class VideoEditor {
       outputRate: 24,
       outputPath: outputPath,
       codec: firstCodec,
+      watermark: watermark,
+      watermarkPosition: watermarkPosition,
       crf: crf,
       preset: preset,
     );
@@ -147,7 +151,20 @@ class VideoEditor {
         combineScript += '-i ' + path + ' ';
       }
 
+      final watermarkFilter =
+          _watermarkInput(watermark, watermarkPosition, withFilter: false);
+
+      if (watermarkFilter.input.isNotEmpty) {
+        combineScript += '${watermarkFilter.input} ';
+      }
+
       combineScript += '-filter_complex "';
+      var watermarkScript = '';
+      if (watermarkFilter.complexFilter.isNotEmpty) {
+        watermarkScript =
+            "; [v][${videoPaths.length}:v]${watermarkFilter.complexFilter} ";
+      }
+
       for (var i = 0; i < videoPaths.length; i++) {
         combineScript +=
             '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
@@ -156,9 +173,14 @@ class VideoEditor {
       for (var i = 0; i < videoPaths.length; i++) {
         combineScript += '[v$i][$i:a]';
       }
-      combineScript +=
-          'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
 
+      if (watermarkScript.isNotEmpty) {
+        combineScript +=
+            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [aout]$watermarkScript[vout]" -map [vout] -map [aout] ';
+      } else {
+        combineScript +=
+            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
+      }
       combineScript +=
           _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
 
@@ -188,10 +210,16 @@ class VideoEditor {
       {bool withFilter = true}) {
     if (watermark.isNotEmpty) {
       // Sets overlay to bottom right corner of screen
+
+      var complexFilter =
+          '-filter_complex \'${watermarkPosition.overlayFilterString}\' ';
+
+      if (!withFilter) {
+        complexFilter = '${watermarkPosition.overlayFilterString} ';
+      }
+
       return WatermarkFiler(
-          input: '-i $watermark ',
-          complexFilter:
-              '${withFilter ? '-filter_complex ' : ''}${watermarkPosition.overlayFilterString} ');
+          input: '-i $watermark ', complexFilter: complexFilter);
     }
 
     return WatermarkFiler();

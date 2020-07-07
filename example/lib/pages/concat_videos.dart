@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:example/pages/example_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/video_util.dart';
@@ -65,11 +66,16 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
               onPressed: () async {
                 var tempDir = await getApplicationDocumentsDirectory();
 
-                final tempPath = '${tempDir.path}/temp.mp4';
+                final tempPath =
+                    '${tempDir.path}/${DateTime.now().toIso8601String()}.mp4';
+
+                //Watermark
+                final watermark = await getWaterMarkPath();
 
                 await videoEditor.combineVideos(
                     videoPaths: [video_1_path, video_2_path],
                     outputPath: tempPath,
+                    watermark: watermark,
                     preset: Preset.superFast);
                 await GallerySaver.saveVideo(tempPath,
                         albumName: "FlutterVideoEditor")
