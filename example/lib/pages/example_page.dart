@@ -31,6 +31,7 @@ class _ExamplePageState extends State<ExamplePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(fileName),
+            Image.asset("assets/35.png"),
             FlatButton(
               child: Text('Pick video'),
               onPressed: () async {
