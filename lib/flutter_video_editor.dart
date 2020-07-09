@@ -25,13 +25,10 @@ class VideoEditor {
   final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
   final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
 
-  VideoEditor() {
-    setupFont();
-  }
-
-  void setupFont() async {
+  Future<String> setupFont() async {
     final filename = 'font.ttf';
-    var bytes = await rootBundle.load("assets/35.png");
+    var bytes = await rootBundle
+        .load("packages/flutter_video_editor/assets/font/aller.ttf");
 
     String dir = (await getApplicationDocumentsDirectory()).path;
     final path = '$dir/$filename';
@@ -45,7 +42,7 @@ class VideoEditor {
     print('Loaded file ${file.path}');
     _flutterFFmpegConfig.setFontDirectory(file.path, null);
 
-    //_flutterFFmpeg.setFontDirectory("<folder with fonts>");
+    return file.path;
   }
 
   /// Returns codec config for video output, should be private as used internally only
@@ -85,9 +82,12 @@ class VideoEditor {
 
     final codecConfig = _getCodecConfig(codec, crf, preset);
 
+    final fontPath = await setupFont();
+
     final script = _buildScript(
         videoPath: videoPath,
         outputPath: outputPath,
+        fontPath: fontPath,
         codecConfig: codecConfig,
         watermark: watermark,
         watermarkPosition: watermarkPosition,
@@ -158,6 +158,7 @@ class VideoEditor {
     String videoPath,
     List<String> videoPaths,
     String outputPath,
+    String fontPath,
     CodecConfig codecConfig,
     String watermark = '',
     WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
@@ -224,7 +225,7 @@ class VideoEditor {
         " " +
         //watermarkFilter.input +
         //watermarkFilter.complexFilter +
-        "-filter_complex [0:v]drawtext=fontsize=90:x=20:y=20:text='Testing' " +
+        "-filter_complex [0:v]drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)' " +
         _codecConfig.encodingOptions +
         " " +
         "-c:v " +

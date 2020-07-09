@@ -24,8 +24,7 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/font/aller.ttf
-    - assets/35.png
+    - packages/flutter_video_editor/assets/font/aller.ttf
   # To add assets to your package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
