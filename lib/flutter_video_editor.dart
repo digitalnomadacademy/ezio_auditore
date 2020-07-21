@@ -1,15 +1,14 @@
 library flutter_video_editor;
 
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/codecs.dart';
-import 'package:flutter_video_editor/constants/library_names.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
-import 'package:flutter_video_editor/encoding_options.dart';
 import 'package:flutter_video_editor/exceptions.dart';
+import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
+import 'package:flutter_video_editor/script_builders/watermark_script_builder.dart';
 import 'package:flutter_video_editor/video_util.dart';
 import 'package:flutter_video_editor/watermark_filter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,26 +44,6 @@ class VideoEditor {
     return file.path;
   }
 
-  /// Returns codec config for video output, should be private as used internally only
-  CodecConfig _getCodecConfig(VideoCodec codec, int crf, Preset preset) {
-    final encodingOptions =
-        EncodingOptions(crf: crf, preset: preset).generate();
-
-    switch (codec) {
-      case VideoCodec.x264:
-        return CodecConfig(
-            libraryName: LibraryNames.h264, encodingOptions: encodingOptions);
-
-      case VideoCodec.x265:
-        return CodecConfig(
-            libraryName: LibraryNames.h265, encodingOptions: encodingOptions);
-
-      default:
-        return CodecConfig(
-            libraryName: LibraryNames.h264, encodingOptions: encodingOptions);
-    }
-  }
-
   /// Function to encode a given video file with the required codec
   /// Watermark if needed must be passed as absolute file path
   Future<VideoOutputState> encodeVideo(
@@ -80,7 +59,7 @@ class VideoEditor {
           'Video path and Output path cannot be empty');
     }
 
-    final codecConfig = _getCodecConfig(codec, crf, preset);
+    final codecConfig = CodecConfig.fromOptions(codec, crf, preset);
 
     final fontPath = await setupFont();
 
@@ -170,89 +149,48 @@ class VideoEditor {
     var _codecConfig = codecConfig;
 
     if (codecConfig == null) {
-      _codecConfig = _getCodecConfig(codec, crf, preset);
+      _codecConfig = CodecConfig.fromOptions(codec, crf, preset);
     }
 
-    //If multiple videoPaths are defined we build a combination script
+    // If multiple videoPaths are defined we build a combination script
     if (videoPaths != null && videoPaths.isNotEmpty) {
-      var combineScript = '-y ';
-      for (final path in videoPaths) {
-        combineScript += '-i ' + path + ' ';
-      }
+      final combineScript = CombineScriptBuilder(
+        videoPaths: videoPaths,
+        outputPath: outputPath,
+        fontPath: fontPath,
+        codecConfig: codecConfig,
+        watermark: watermark,
+        watermarkPosition: watermarkPosition,
+        codec: codec,
+        outputRate: outputRate,
+        crf: crf,
+        preset: preset,
+      );
 
-      final watermarkFilter =
-          _watermarkInput(watermark, watermarkPosition, withFilter: false);
-
-      if (watermarkFilter.input.isNotEmpty) {
-        combineScript += '${watermarkFilter.input} ';
-      }
-
-      combineScript += '-filter_complex "';
-      var watermarkScript = '';
-      if (watermarkFilter.complexFilter.isNotEmpty) {
-        watermarkScript =
-            "; [v][${videoPaths.length}:v]${watermarkFilter.complexFilter} ";
-      }
-
-      for (var i = 0; i < videoPaths.length; i++) {
-        combineScript +=
-            '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
-      }
-
-      for (var i = 0; i < videoPaths.length; i++) {
-        combineScript += '[v$i][$i:a]';
-      }
-
-      if (watermarkScript.isNotEmpty) {
-        combineScript +=
-            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [aout]$watermarkScript[vout]" -map [vout] -map [aout] ';
-      } else {
-        combineScript +=
-            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
-      }
-      combineScript +=
-          _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
-
-      combineScript += outputPath;
-
-      return combineScript;
+      return combineScript.build();
     }
-    final watermarkFilter = _watermarkInput(watermark, watermarkPosition);
+
+    final watermarkFilter = WatermarkScriptBuilder(
+            watermark: watermark,
+            watermarkPosition: watermarkPosition,
+            withFilter: false)
+        .build();
 
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
     return "-y -i " +
         videoPath +
         " " +
-        //watermarkFilter.input +
+        watermarkFilter.input +
         //watermarkFilter.complexFilter +
-        "-filter_complex [0:v]drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)' " +
+        "-filter_complex \"[0:v][1:v]${watermarkFilter.complexFilter},drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)'\" " +
+        //watermarkFilter.complexFilter +
+        //" " +
         _codecConfig.encodingOptions +
         " " +
         "-c:v " +
         _codecConfig.libraryName +
         " -r $outputRate " +
         outputPath;
-  }
-
-  /// Takes absolute path of watermark and returns ffmpeg input and filter params
-  WatermarkFiler _watermarkInput(
-      String watermark, WatermarkPosition watermarkPosition,
-      {bool withFilter = true}) {
-    if (watermark.isNotEmpty) {
-      // Sets overlay to bottom right corner of screen
-
-      var complexFilter =
-          '-filter_complex \'${watermarkPosition.overlayFilterString}\' ';
-
-      if (!withFilter) {
-        complexFilter = '${watermarkPosition.overlayFilterString} ';
-      }
-
-      return WatermarkFiler(
-          input: '-i $watermark ', complexFilter: complexFilter);
-    }
-
-    return WatermarkFiler();
   }
 }
 
@@ -265,6 +203,13 @@ class VideoEditor {
 /// boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2" -codec:a copy output.mp4
 
 /*
+
+```
+ffmpeg -i video.mp4 -i logo.png -filter_complex
+"[0:v][1:v]overlay=10:10,drawtext=text='Hello World'" -c:a copy -movflags +faststart output.mp4
+
+```
+
 Just chain the drawtext, at the end.
 
 ffmpeg \
