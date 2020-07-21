@@ -8,7 +8,7 @@ import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
-import 'package:flutter_video_editor/script_builders/watermark_script_builder.dart';
+import 'package:flutter_video_editor/script_builders/simple_script_builder.dart';
 import 'package:flutter_video_editor/video_util.dart';
 import 'package:flutter_video_editor/watermark_filter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -130,7 +130,6 @@ class VideoEditor {
     return VideoOutputState.failure;
   }
 
-  // Todo: Build this method along as we add more functionality
   /// Private function to help generate scripts for ffmpeg
   /// Gives preference to CodecConfig if passed as an argument
   String _buildScript({
@@ -146,12 +145,6 @@ class VideoEditor {
     int crf,
     Preset preset,
   }) {
-    var _codecConfig = codecConfig;
-
-    if (codecConfig == null) {
-      _codecConfig = CodecConfig.fromOptions(codec, crf, preset);
-    }
-
     // If multiple videoPaths are defined we build a combination script
     if (videoPaths != null && videoPaths.isNotEmpty) {
       final combineScript = CombineScriptBuilder(
@@ -170,70 +163,17 @@ class VideoEditor {
       return combineScript.build();
     }
 
-    final watermarkFilter = WatermarkScriptBuilder(
-            watermark: watermark,
-            watermarkPosition: watermarkPosition,
-            withFilter: false)
-        .build();
-
-    /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
-    return "-y -i " +
-        videoPath +
-        " " +
-        watermarkFilter.input +
-        //watermarkFilter.complexFilter +
-        "-filter_complex \"[0:v][1:v]${watermarkFilter.complexFilter},drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)'\" " +
-        //watermarkFilter.complexFilter +
-        //" " +
-        _codecConfig.encodingOptions +
-        " " +
-        "-c:v " +
-        _codecConfig.libraryName +
-        " -r $outputRate " +
-        outputPath;
+    return SimpleScriptBuilder(
+      videoPath: videoPath,
+      outputPath: outputPath,
+      fontPath: fontPath,
+      codecConfig: codecConfig,
+      watermark: watermark,
+      watermarkPosition: watermarkPosition,
+      codec: codec,
+      outputRate: outputRate,
+      crf: crf,
+      preset: preset,
+    ).build();
   }
 }
-
-/// ffmpeg -i input -filter_complex "drawtext=text='Summer Video':enable='between(t,15,20)',
-/// fade=t=in:start_time=15:d=0.5:alpha=1,fade=t=out:start_time=19.5:d=0.5:alpha=1[fg];
-/// [0][fg]overlay=format=auto,format=yuv420p" -c:a copy output.mp4
-///
-/// ffmpeg -i input.mp4 -vf drawtext="fontfile=/path/to/font.ttf: \
-/// text='Stack Overflow': fontcolor=white: fontsize=24: box=1: boxcolor=black@0.5: \
-/// boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2" -codec:a copy output.mp4
-
-/*
-
-```
-ffmpeg -i video.mp4 -i logo.png -filter_complex
-"[0:v][1:v]overlay=10:10,drawtext=text='Hello World'" -c:a copy -movflags +faststart output.mp4
-
-```
-
-Just chain the drawtext, at the end.
-
-ffmpeg \
--i video1.mp4 -i video2.mp4
--filter_complex "[0:v:0] [0:a:0] [0:v:1] [0:a:1] concat=n=2:v=1:a=1 [v][a];
-[v]drawtext=text='SOME TEXT':x=(w-text_w):y=(h-text_h):fontfile=OpenSans.ttf:fontsize=30:fontcolor=white[v]" \
--map "[v]" -map "[a]" -deinterlace \
--vcodec libx264 -pix_fmt yuv420p -preset $QUAL -r $FPS -g $(($FPS * 2)) -b:v $VBR \
--acodec libmp3lame -ar 44100 -threads 6 -qscale 3 -b:a 712000 -bufsize 512k \
--f flv "$YOUTUBE_URL/$KEY"
-*/
-
-/*
-ffmpeg -loop 1 -i mic720x1280.png -i waves5.mp4
--filter_complex "color=0x000000@0,format=gbrap[bg];[0]format=gbrap,drawtext=fontfile=Montserrat-Bold.ttf:
-text='Hello': fontcolor=white: fontsize=44: box=1: boxcolor=black@0.5: boxborderw=10: x=(w-text_w)/2:
-y=100,setsar=1[img];[bg][img]scale2ref[bg][img];[bg]setsar=1[bg];[1]scale=500:-1,format=gbrap[vid];
-[bg][vid]overlay=70:70:format=rgb[vidbl];[vidbl][img]blend=all_mode=addition" -c:v libx264 -t 15
--pix_fmt yuv420p myvid.mp4
-* */
-
-/*
-ffmpeg -i i.mp4 -i watermarkfile.png -filter_complex \
-"[0:v]drawtext=text='TESTING':fontcolor=black@1.0:fontsize=36:x=00:y=40[text]; \
-[text][1:v]overlay[filtered]" -map "[filtered]" \
--map 0:a -codec:v libx264 -codec:a copy output.mp4
-* */
