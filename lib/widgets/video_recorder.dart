@@ -33,7 +33,9 @@ class VideoRecorderController extends CameraController {
   bool isDisposed = false;
   final ResolutionPreset resolutionPreset;
 
-  VideoRecorderController({CameraDescription cameraDescription, this.resolutionPreset = ResolutionPreset.veryHigh})
+  VideoRecorderController(
+      {CameraDescription cameraDescription,
+      this.resolutionPreset = ResolutionPreset.veryHigh})
       : super(cameraDescription, resolutionPreset);
 
   @override
