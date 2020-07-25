@@ -40,7 +40,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
     final watermarkFilter = WatermarkScriptBuilder(
             watermark: watermark,
             watermarkPosition: watermarkPosition,
-            withFilter: true)
+            withFilter: false)
         .build();
 
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
@@ -50,8 +50,10 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
         videoPath +
         " " +
         watermarkFilter.input +
-        watermarkFilter.complexFilter +
-        " " +
+        "-filter_complex \"[0:v][1:v]${watermarkFilter.complexFilter},drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)',drawtext=fontfile='$fontPath':fontsize=90:x=20:y=260:text='OTHER TEXT':enable='between(t\\,3\\,4)'\" " +
+
+        // watermarkFilter.complexFilter +
+        //" " +
         _codecConfig.encodingOptions +
         " " +
         "-c:v " +

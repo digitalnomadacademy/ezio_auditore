@@ -14,9 +14,7 @@ class VideoRecorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-        aspectRatio: controller.value.aspectRatio,
-        child: CameraPreview(controller));
+    return CameraPreview(controller);
   }
 }
 
