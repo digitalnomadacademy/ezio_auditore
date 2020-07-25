@@ -31,9 +31,10 @@ class VideoRecorderInitializer {
 class VideoRecorderController extends CameraController {
   CameraType cameraType = CameraType.back; //opens the back camera by default
   bool isDisposed = false;
+  final ResolutionPreset resolutionPreset;
 
-  VideoRecorderController({CameraDescription cameraDescription})
-      : super(cameraDescription, ResolutionPreset.medium);
+  VideoRecorderController({CameraDescription cameraDescription, this.resolutionPreset = ResolutionPreset.veryHigh})
+      : super(cameraDescription, resolutionPreset);
 
   @override
   Future<void> initialize() {
