@@ -41,14 +41,14 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
       _codecConfig = CodecConfig.fromOptions(codec, crf, preset);
     }
 
+    final textFilterScript =
+        DrawTextScriptBuilder(textFilters, fontPath).build();
+
     final watermarkFilter = WatermarkScriptBuilder(
             watermark: watermark,
             watermarkPosition: watermarkPosition,
-            withFilter: false)
+            withFilter: textFilterScript.isEmpty)
         .build();
-
-    final textFilterScript =
-        DrawTextScriptBuilder(textFilters, fontPath).build();
 
     final filters = _filters(watermarkFilter, textFilterScript);
 
@@ -67,7 +67,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
 
   String _filters(WatermarkFiler watermarkFilter, String textFilterScript) {
     if (textFilterScript.isEmpty) {
-      return watermarkFilter.input + watermarkFilter.complexFilter + " ";
+      return watermarkFilter.input + watermarkFilter.complexFilter;
     } else if (watermarkFilter.input.isNotEmpty &&
         textFilterScript.isNotEmpty) {
       return watermarkFilter.input +
