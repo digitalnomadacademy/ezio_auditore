@@ -21,7 +21,7 @@ enum VideoOutputState {
 
 /// VideoEditor class which will be used by our VideoViewer as well.
 class VideoEditor {
-  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
+  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
 
   Future<String> setupFont() async {
