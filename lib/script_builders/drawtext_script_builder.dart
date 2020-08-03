@@ -28,4 +28,3 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
 
   //Todo: Make a text processor for long strings
 }
-
