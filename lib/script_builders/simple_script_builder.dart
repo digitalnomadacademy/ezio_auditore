@@ -50,7 +50,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
         videoPath +
         " " +
         watermarkFilter.input +
-        "-filter_complex \"[0:v][1:v]${watermarkFilter.complexFilter},drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)',drawtext=fontfile='$fontPath':fontsize=90:x=20:y=260:text='OTHER TEXT':enable='between(t\\,3\\,4)'\" " +
+        "-filter_complex \"[0:v][1:v]${watermarkFilter.complexFilter},drawtext=fontfile='$fontPath':fontsize=90:x=20:y=20:text='Testing':enable='between(t\\,1\\,2)',drawbox=enable='between(t\\,3\\,4)':y=ih-h:color=black:width=iw:height=350:t=fill,drawtext=fontfile='$fontPath':fontsize=90:fontcolor=white:x=(w-text_w)/2:y=h-th:text='OTHER TEXT LONG SUPER\n LONG LONG LONG':enable='between(t\\,3\\,4)'\" " +
 
         // watermarkFilter.complexFilter +
         //" " +
