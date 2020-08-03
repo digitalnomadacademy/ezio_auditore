@@ -14,13 +14,21 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
 
     // Todo: Add support for colors passed in textFilters for ffmpeg
     // drawtext and drawbox are two different filters and must be comma separated
-    for (final textFilter in textFilters) {
+    for (var i = 0; i < textFilters.length; i++) {
+      final textFilter = textFilters[i];
       if (textFilter.hasBox) {
         filter +=
             "drawbox=enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})':y=${textFilter.textPosition.boxPosition}:color=black:width=iw:height=350:t=fill, ";
       }
+
+      var separator = ', ';
+      if (i == textFilters.length - 1) {
+        // No need to separate by comma
+        separator = '';
+      }
+
       filter +=
-          "drawtext=fontfile='$fontPath':fontsize=${textFilter.fontSize}:fontcolor=white:${textFilter.textPosition.textPosition}:text='${textFilter.text}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'";
+          "drawtext=fontfile='$fontPath':fontsize=${textFilter.fontSize}:fontcolor=white:${textFilter.textPosition.textPosition}:text='${textFilter.text}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$separator";
     }
 
     return filter;
