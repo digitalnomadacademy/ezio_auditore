@@ -1,14 +1,17 @@
 library flutter_video_editor;
 
+import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/codecs.dart';
-import 'package:flutter_video_editor/constants/library_names.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
-import 'package:flutter_video_editor/encoding_options.dart';
 import 'package:flutter_video_editor/exceptions.dart';
+import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
+import 'package:flutter_video_editor/script_builders/simple_script_builder.dart';
 import 'package:flutter_video_editor/video_util.dart';
-import 'package:flutter_video_editor/watermark_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Enums to represent different states of video output functions
 enum VideoOutputState {
@@ -18,26 +21,27 @@ enum VideoOutputState {
 
 /// VideoEditor class which will be used by our VideoViewer as well.
 class VideoEditor {
-  final FlutterFFmpeg _flutterFFmpeg = new FlutterFFmpeg();
+  final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
+  final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
 
-  /// Returns codec config for video output, should be private as used internally only
-  CodecConfig _getCodecConfig(VideoCodec codec, int crf, Preset preset) {
-    final encodingOptions =
-        EncodingOptions(crf: crf, preset: preset).generate();
+  Future<String> setupFont() async {
+    final filename = 'font.ttf';
+    var bytes = await rootBundle
+        .load("packages/flutter_video_editor/assets/font/aller.ttf");
 
-    switch (codec) {
-      case VideoCodec.x264:
-        return CodecConfig(
-            libraryName: LibraryNames.h264, encodingOptions: encodingOptions);
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    final path = '$dir/$filename';
 
-      case VideoCodec.x265:
-        return CodecConfig(
-            libraryName: LibraryNames.h265, encodingOptions: encodingOptions);
+    final buffer = bytes.buffer;
+    await File(path).writeAsBytes(
+        buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes));
 
-      default:
-        return CodecConfig(
-            libraryName: LibraryNames.h264, encodingOptions: encodingOptions);
-    }
+    File file = File('$dir/$filename');
+
+    print('Loaded file ${file.path}');
+    _flutterFFmpegConfig.setFontDirectory(file.path, null);
+
+    return file.path;
   }
 
   /// Function to encode a given video file with the required codec
@@ -55,11 +59,14 @@ class VideoEditor {
           'Video path and Output path cannot be empty');
     }
 
-    final codecConfig = _getCodecConfig(codec, crf, preset);
+    final codecConfig = CodecConfig.fromOptions(codec, crf, preset);
+
+    final fontPath = await setupFont();
 
     final script = _buildScript(
         videoPath: videoPath,
         outputPath: outputPath,
+        fontPath: fontPath,
         codecConfig: codecConfig,
         watermark: watermark,
         watermarkPosition: watermarkPosition,
@@ -123,13 +130,13 @@ class VideoEditor {
     return VideoOutputState.failure;
   }
 
-  // Todo: Build this method along as we add more functionality
   /// Private function to help generate scripts for ffmpeg
   /// Gives preference to CodecConfig if passed as an argument
   String _buildScript({
     String videoPath,
     List<String> videoPaths,
     String outputPath,
+    String fontPath,
     CodecConfig codecConfig,
     String watermark = '',
     WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
@@ -138,90 +145,35 @@ class VideoEditor {
     int crf,
     Preset preset,
   }) {
-    var _codecConfig = codecConfig;
-
-    if (codecConfig == null) {
-      _codecConfig = _getCodecConfig(codec, crf, preset);
-    }
-
-    //If multiple videoPaths are defined we build a combination script
+    // If multiple videoPaths are defined we build a combination script
     if (videoPaths != null && videoPaths.isNotEmpty) {
-      var combineScript = '-y ';
-      for (final path in videoPaths) {
-        combineScript += '-i ' + path + ' ';
-      }
+      final combineScript = CombineScriptBuilder(
+        videoPaths: videoPaths,
+        outputPath: outputPath,
+        fontPath: fontPath,
+        codecConfig: codecConfig,
+        watermark: watermark,
+        watermarkPosition: watermarkPosition,
+        codec: codec,
+        outputRate: outputRate,
+        crf: crf,
+        preset: preset,
+      );
 
-      final watermarkFilter =
-          _watermarkInput(watermark, watermarkPosition, withFilter: false);
-
-      if (watermarkFilter.input.isNotEmpty) {
-        combineScript += '${watermarkFilter.input} ';
-      }
-
-      combineScript += '-filter_complex "';
-      var watermarkScript = '';
-      if (watermarkFilter.complexFilter.isNotEmpty) {
-        watermarkScript =
-            "; [v][${videoPaths.length}:v]${watermarkFilter.complexFilter} ";
-      }
-
-      for (var i = 0; i < videoPaths.length; i++) {
-        combineScript +=
-            '[$i:v]scale=720:1280:force_original_aspect_ratio=0[v$i]; ';
-      }
-
-      for (var i = 0; i < videoPaths.length; i++) {
-        combineScript += '[v$i][$i:a]';
-      }
-
-      if (watermarkScript.isNotEmpty) {
-        combineScript +=
-            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [aout]$watermarkScript[vout]" -map [vout] -map [aout] ';
-      } else {
-        combineScript +=
-            'concat=unsafe=1:n=${videoPaths.length}:v=1:a=1 [v] [a]" -map [v] -map [a] ';
-      }
-      combineScript +=
-          _codecConfig.encodingOptions + ' -vsync 2 -r $outputRate ';
-
-      combineScript += outputPath;
-
-      return combineScript;
-    }
-    final watermarkFilter = _watermarkInput(watermark, watermarkPosition);
-
-    /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
-    return "-y -i " +
-        videoPath +
-        " " +
-        watermarkFilter.input +
-        watermarkFilter.complexFilter +
-        _codecConfig.encodingOptions +
-        " " +
-        "-c:v " +
-        _codecConfig.libraryName +
-        " -r $outputRate " +
-        outputPath;
-  }
-
-  /// Takes absolute path of watermark and returns ffmpeg input and filter params
-  WatermarkFiler _watermarkInput(
-      String watermark, WatermarkPosition watermarkPosition,
-      {bool withFilter = true}) {
-    if (watermark.isNotEmpty) {
-      // Sets overlay to bottom right corner of screen
-
-      var complexFilter =
-          '-filter_complex \'${watermarkPosition.overlayFilterString}\' ';
-
-      if (!withFilter) {
-        complexFilter = '${watermarkPosition.overlayFilterString} ';
-      }
-
-      return WatermarkFiler(
-          input: '-i $watermark ', complexFilter: complexFilter);
+      return combineScript.build();
     }
 
-    return WatermarkFiler();
+    return SimpleScriptBuilder(
+      videoPath: videoPath,
+      outputPath: outputPath,
+      fontPath: fontPath,
+      codecConfig: codecConfig,
+      watermark: watermark,
+      watermarkPosition: watermarkPosition,
+      codec: codec,
+      outputRate: outputRate,
+      crf: crf,
+      preset: preset,
+    ).build();
   }
 }
