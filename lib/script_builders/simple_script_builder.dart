@@ -46,8 +46,6 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
             withFilter: false)
         .build();
 
-
-
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
 
     // Todo: Separate scripts for cases 1: With watermark and text, 2: Text only

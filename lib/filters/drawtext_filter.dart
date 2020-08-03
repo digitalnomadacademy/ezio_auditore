@@ -1,19 +1,45 @@
 import 'dart:ui';
 
-enum TextPosition {
+enum VideoTextPosition {
   top,
   bottom,
 }
 
+extension VideoTextPositionExt on VideoTextPosition {
+  String get boxPosition {
+    switch (this) {
+      case VideoTextPosition.top:
+        return 'ih-ih';
+
+      case VideoTextPosition.bottom:
+        return 'ih-h';
+    }
+
+    return 'ih-h';
+  }
+
+  String get textPosition {
+    switch (this) {
+      case VideoTextPosition.top:
+        return 'x=(w-text_w)/2:y=0';
+
+      case VideoTextPosition.bottom:
+        return 'x=(w-text_w)/2:y=h-th';
+    }
+
+    return 'x=(w-text_w)/2:y=h-th';
+  }
+}
+
 class DrawTextFilter {
   final String text;
-  final double fontSize;
+  final int fontSize;
   final bool hasBox;
   final Color boxColor;
   final Color textColor;
   final int startTimeInSeconds;
   final int endTimeInSeconds;
-  final TextPosition textPosition;
+  final VideoTextPosition textPosition;
 
   const DrawTextFilter({
     this.text,
@@ -23,6 +49,6 @@ class DrawTextFilter {
     this.textColor,
     this.startTimeInSeconds,
     this.endTimeInSeconds,
-    this.textPosition = TextPosition.bottom,
+    this.textPosition = VideoTextPosition.bottom,
   });
 }
