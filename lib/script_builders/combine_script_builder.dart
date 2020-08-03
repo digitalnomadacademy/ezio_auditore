@@ -2,7 +2,7 @@ import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/script_builders/base_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/watermark_script_builder.dart';
-import 'package:flutter_video_editor/watermark_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
 
 class CombineScriptBuilder implements BaseScriptBuilder {
   final List<String> videoPaths;

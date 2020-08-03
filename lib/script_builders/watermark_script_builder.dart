@@ -1,4 +1,4 @@
-import 'package:flutter_video_editor/watermark_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
 
 class WatermarkScriptBuilder {
   final String watermark;

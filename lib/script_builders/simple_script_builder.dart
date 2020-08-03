@@ -1,8 +1,9 @@
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
 import 'package:flutter_video_editor/script_builders/base_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/watermark_script_builder.dart';
-import 'package:flutter_video_editor/watermark_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
 
 class SimpleScriptBuilder implements BaseScriptBuilder {
   final String videoPath;
@@ -15,6 +16,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
   final int outputRate;
   final int crf;
   final Preset preset;
+  final List<DrawTextFilter> textFilters;
 
   const SimpleScriptBuilder({
     this.videoPath,
@@ -27,6 +29,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
     this.outputRate,
     this.crf,
     this.preset,
+    this.textFilters = const [],
   });
 
   @override
@@ -42,6 +45,8 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
             watermarkPosition: watermarkPosition,
             withFilter: false)
         .build();
+
+
 
     /// For documentation regarding flags https://ffmpeg.org/ffmpeg.html#toc-Main-options
 

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:flutter_video_editor/watermark_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:http/http.dart' as http;
 
