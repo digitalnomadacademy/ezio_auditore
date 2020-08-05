@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -40,6 +39,13 @@ class VideoInfo {
 
   factory VideoInfo.fromMap(Map<dynamic, dynamic> map, size) {
     debugPrint(map.toString());
+
+    var frameRate = 0.0;
+
+    try {
+      frameRate = double.parse(map['streams'][0]['realFrameRate']);
+    } catch (e) {}
+
     return VideoInfo(
       fileSize: size / 1000.0,
       duration: map['duration'] as int,
@@ -52,7 +58,7 @@ class VideoInfo {
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
               ? VideoCodec.x264
               : VideoCodec.x265,
-      frameRate: double.parse(map['streams'][0]['realFrameRate']),
+      frameRate: frameRate,
     );
   }
 
