@@ -9,7 +9,7 @@ import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
 import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/simple_script_builder.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:path_provider/path_provider.dart';
 

@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/flutter_video_editor.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:path_provider/path_provider.dart';
 

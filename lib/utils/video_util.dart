@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
-import 'codecs.dart';
+import '../codecs.dart';
 
 class VideoUtil {
   final FlutterFFprobe _flutterFFprobe = FlutterFFprobe();

@@ -33,6 +33,4 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
 
     return filter;
   }
-
-  //Todo: Make a text processor for long strings
 }
