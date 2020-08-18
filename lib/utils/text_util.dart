@@ -1,3 +1,5 @@
+import 'package:string_validator/string_validator.dart';
+
 class ProcessedString {
   final List<String> tokens;
   final int scaledFontSize;
@@ -39,23 +41,73 @@ class TextUtil {
   List<String> _baseTokens(int charLength) {
     final textUnits = text.codeUnits;
     var parsedText = '';
+    var checkAdjustment = 0;
+    var nextCharAdded = false;
 
     for (var i = 0; i < textUnits.length; i++) {
-      if (i != 0 && i % charLength == 0) {
+      if (i != 0 && (i - checkAdjustment) % charLength == 0) {
         if (String.fromCharCode(textUnits[i]) == ' ') {
           parsedText += '\n';
+          checkAdjustment = 0;
           continue;
         } else {
           //Check if next character is not alpha then continue
+          final char = String.fromCharCode(textUnits[i]);
+          final hasAnotherChar = i + 1 < textUnits.length;
+
+          if (isAlpha(char)) {
+            if (hasAnotherChar) {
+              final nextChar = String.fromCharCode(textUnits[i + 1]);
+              if (!isAlpha(nextChar)) {
+                parsedText += "$char$nextChar";
+                checkAdjustment = 1;
+                continue;
+              }
+            }
+          } else {
+            if (hasAnotherChar) {
+              if (String.fromCharCode(textUnits[i + 1]) == ' ') {
+                parsedText += '\n';
+                checkAdjustment = 0;
+                continue;
+              }
+            }
+          }
 
           //Check if its a two letter word by comparing next three characters
+          if (hasAnotherChar) {
+            final nextChar = String.fromCharCode(textUnits[i + 1]);
+
+            if (i + 2 < textUnits.length) {
+              if (String.fromCharCode(textUnits[i + 2]) == ' ' &&
+                  (i + 2) % charLength != 0) {
+                parsedText += '$char$nextChar\n';
+                nextCharAdded = true;
+                continue;
+              } else if (!isAlpha(String.fromCharCode(textUnits[i + 2]))) {
+                //We can join it
+                parsedText += '$char$nextChar';
+                nextCharAdded = true;
+                continue;
+              }
+            } else {
+              //This is the last char
+              parsedText += '$char$nextChar';
+              nextCharAdded = true;
+              continue;
+            }
+          }
           // If so then continue
-          parsedText += '${String.fromCharCode(textUnits[i])}-\n';
+          parsedText += '$char-\n';
+          checkAdjustment = 0;
           continue;
         }
       }
 
-      parsedText += String.fromCharCode(textUnits[i]);
+      if (!nextCharAdded) {
+        parsedText += String.fromCharCode(textUnits[i]);
+      }
+      nextCharAdded = false;
     }
 
     return parsedText.split('\n');
