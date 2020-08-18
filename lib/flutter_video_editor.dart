@@ -7,6 +7,7 @@ import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
 import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/simple_script_builder.dart';
 import 'package:flutter_video_editor/utils/video_util.dart';
@@ -53,6 +54,7 @@ class VideoEditor {
       String watermark = '',
       WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
       int crf = 27,
+      List<DrawTextFilter> textFilters = const [],
       Preset preset = Preset.defaultPreset}) async {
     if (videoPath.isEmpty || outputPath.isEmpty) {
       throw InvalidArgumentException(
@@ -62,12 +64,15 @@ class VideoEditor {
     final codecConfig = CodecConfig.fromOptions(codec, crf, preset);
 
     final fontPath = await setupFont();
+    var info = await VideoUtil().getVideoInfo(videoPath);
 
     final script = _buildScript(
         videoPath: videoPath,
         outputPath: outputPath,
         fontPath: fontPath,
+        textFilters: textFilters,
         codecConfig: codecConfig,
+        info: info,
         watermark: watermark,
         watermarkPosition: watermarkPosition,
         outputRate: 30);
@@ -137,11 +142,13 @@ class VideoEditor {
     List<String> videoPaths,
     String outputPath,
     String fontPath,
+    VideoInfo info,
     CodecConfig codecConfig,
     String watermark = '',
     WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
     VideoCodec codec,
     int outputRate,
+    List<DrawTextFilter> textFilters,
     int crf,
     Preset preset,
   }) {
@@ -172,7 +179,9 @@ class VideoEditor {
       watermarkPosition: watermarkPosition,
       codec: codec,
       outputRate: outputRate,
+      textFilters: textFilters,
       crf: crf,
+      info: info,
       preset: preset,
     ).build();
   }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
 import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:http/http.dart' as http;
@@ -56,12 +57,27 @@ class _ExamplePageState extends State<ExamplePage> {
                 //Watermark
                 final watermark = await getWaterMarkPath();
 
+                //Text Filters
+                final textFilters = [
+                  DrawTextFilter(
+                    text:
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet necas",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 1,
+                    endTimeInSeconds: 3,
+                    textPosition: VideoTextPosition.bottom,
+                  )
+                ];
+
                 Stopwatch stopwatch = Stopwatch()..start();
                 final result = await videoEditor.encodeVideo(
                   videoPath: videoPath,
                   codec: VideoCodec.x264,
                   outputPath: tempPath,
                   watermark: watermark,
+                  textFilters: textFilters,
                   watermarkPosition: WatermarkPosition.topRight,
                   preset: Preset.veryFast,
                 );

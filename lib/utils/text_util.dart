@@ -10,7 +10,7 @@ class TextUtil {
 
   TextUtil(this.text);
 
-  static const FONT_SIZE_REF = 24;
+  static const FONT_SIZE_REF = (24 * 3);
   static const WORDS_IN_LINE = 4;
   static const CHARS_IN_LINE = 27;
   static const MAX_LINES = 6;
@@ -32,7 +32,7 @@ class TextUtil {
           _baseTokens((ratio * CHARS_IN_LINE).floor()), scaledFont);
     } else {
       // Split normal text into tokens
-      return ProcessedString(_baseTokens(CHARS_IN_LINE), FONT_SIZE_REF);
+      return ProcessedString(_baseTokens(CHARS_IN_LINE), FONT_SIZE_REF.floor());
     }
   }
 
@@ -46,6 +46,10 @@ class TextUtil {
           parsedText += '\n';
           continue;
         } else {
+          //Check if next character is not alpha then continue
+
+          //Check if its a two letter word by comparing next three characters
+          // If so then continue
           parsedText += '${String.fromCharCode(textUnits[i])}-\n';
           continue;
         }

@@ -26,6 +26,8 @@ class VideoInfo {
   final double frameRate;
   final double fileSize;
 
+  int get rotatedHeight => isVertical ? width : height;
+
   const VideoInfo({
     @required this.width,
     @required this.height,
