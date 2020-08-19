@@ -61,7 +61,7 @@ class _ExamplePageState extends State<ExamplePage> {
                 final textFilters = [
                   DrawTextFilter(
                     text:
-                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec qu",
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ae",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,

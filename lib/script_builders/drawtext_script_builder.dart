@@ -8,6 +8,8 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
   final List<DrawTextFilter> textFilters;
   final String fontPath;
 
+  final _textMargin = 55;
+
   DrawTextScriptBuilder(this.textFilters, this.fontPath, {this.videoInfo});
 
   /// Takes text filters list passed in constructor and builds a script to return
@@ -33,9 +35,21 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
       }
 
       final processedString = TextUtil(textFilter.text).tokenize();
+      final numOfLines = processedString.tokens.length;
+      final maxMargin = numOfLines * _textMargin;
 
-      filter +=
-          "drawtext=fontfile='$fontPath':fontsize=${processedString.scaledFontSize}:fontcolor=white:${textFilter.textPosition.textPosition}:text='${processedString.tokens.join("\n")}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$separator";
+      for (var j = 0; j < numOfLines; j++) {
+        final margin =
+            maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 30 : 0)));
+
+        var textSeparator = ", ";
+        if (j == numOfLines - 1) textSeparator = '';
+
+        filter +=
+            "drawtext=fontfile='$fontPath':fontsize=${processedString.scaledFontSize}:fontcolor=white:${textFilter.textPosition.textPosition}-$margin:text='${processedString.tokens[j]}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$textSeparator";
+      }
+
+      filter += separator;
     }
 
     return filter;
