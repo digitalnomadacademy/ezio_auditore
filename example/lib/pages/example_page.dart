@@ -60,14 +60,13 @@ class _ExamplePageState extends State<ExamplePage> {
                 //Text Filters
                 final textFilters = [
                   DrawTextFilter(
-                    text:
-                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ae",
+                    text: "This is a text",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,
                     startTimeInSeconds: 1,
                     endTimeInSeconds: 3,
-                    textPosition: VideoTextPosition.bottom,
+                    textPosition: VideoTextPosition.top,
                   )
                 ];
 

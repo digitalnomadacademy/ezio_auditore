@@ -63,6 +63,8 @@ class CombineScriptBuilder implements BaseScriptBuilder {
       combineScript += '${watermarkFilter.input} ';
     }
 
+    var separator = textFilterScript.isNotEmpty ? ", " : '';
+
     combineScript += '-filter_complex "';
     var watermarkScript = '';
     if (watermarkFilter.complexFilter.isNotEmpty) {
@@ -78,8 +80,6 @@ class CombineScriptBuilder implements BaseScriptBuilder {
     for (var i = 0; i < videoPaths.length; i++) {
       combineScript += '[v$i][$i:a]';
     }
-
-    var separator = textFilterScript.isNotEmpty ? ", " : '';
 
     if (watermarkScript.isNotEmpty) {
       combineScript +=

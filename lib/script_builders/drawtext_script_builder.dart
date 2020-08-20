@@ -37,17 +37,22 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
 
       final processedString = TextUtil(textFilter.text).tokenize();
       final numOfLines = processedString.tokens.length;
-      final maxMargin = numOfLines * _textMargin;
+      final isBottomPosition =
+          textFilter.textPosition == VideoTextPosition.bottom;
+      final maxMargin =
+          isBottomPosition ? (numOfLines * _textMargin) : _textMargin;
+      final marginOperator = isBottomPosition ? "-" : "+";
 
       for (var j = 0; j < numOfLines; j++) {
-        final margin =
-            maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 30 : 0)));
+        final margin = isBottomPosition
+            ? (maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 30 : 0))))
+            : (maxMargin + (j * (_textMargin + ((numOfLines < 4) ? 30 : 0))));
 
         var textSeparator = ", ";
         if (j == numOfLines - 1) textSeparator = '';
 
         filter +=
-            "drawtext=fontfile='$fontPath':fontsize=${processedString.scaledFontSize}:fontcolor=white:${textFilter.textPosition.textPosition}-$margin:text='${processedString.tokens[j]}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$textSeparator";
+            "drawtext=fontfile='$fontPath':fontsize=${processedString.scaledFontSize}:fontcolor=white:${textFilter.textPosition.textPosition}$marginOperator$margin:text='${processedString.tokens[j]}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$textSeparator";
       }
 
       filter += separator;

@@ -78,16 +78,17 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                 final List<DrawTextFilter> textFilters = [
                   DrawTextFilter(
                     text:
-                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ae",
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,
                     startTimeInSeconds: 1,
                     endTimeInSeconds: 5,
-                    textPosition: VideoTextPosition.bottom,
+                    textPosition: VideoTextPosition.top,
                   ),
                   DrawTextFilter(
-                    text: "The other text",
+                    text:
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,
