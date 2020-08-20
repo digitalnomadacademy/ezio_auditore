@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 
-import 'codecs.dart';
+import '../codecs.dart';
 
 class VideoUtil {
   final FlutterFFprobe _flutterFFprobe = FlutterFFprobe();
@@ -25,6 +25,11 @@ class VideoInfo {
   final bool isVertical;
   final double frameRate;
   final double fileSize;
+
+  int get rotatedHeight => isVertical ? width : height;
+  int get rotatedWidth => isVertical ? height : width;
+
+  int get totalPixels => width * height;
 
   const VideoInfo({
     @required this.width,

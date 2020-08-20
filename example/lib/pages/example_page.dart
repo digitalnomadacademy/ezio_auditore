@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
 import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/flutter_video_editor.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -56,12 +57,26 @@ class _ExamplePageState extends State<ExamplePage> {
                 //Watermark
                 final watermark = await getWaterMarkPath();
 
+                //Text Filters
+                final textFilters = [
+                  DrawTextFilter(
+                    text: "This is a text",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 1,
+                    endTimeInSeconds: 3,
+                    textPosition: VideoTextPosition.top,
+                  )
+                ];
+
                 Stopwatch stopwatch = Stopwatch()..start();
                 final result = await videoEditor.encodeVideo(
                   videoPath: videoPath,
                   codec: VideoCodec.x264,
                   outputPath: tempPath,
                   watermark: watermark,
+                  textFilters: textFilters,
                   watermarkPosition: WatermarkPosition.topRight,
                   preset: Preset.veryFast,
                 );

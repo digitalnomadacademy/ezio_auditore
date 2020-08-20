@@ -11,6 +11,8 @@ dependencies:
   flutter_ffmpeg: ^0.2.10
   camera: ^0.5.8+2
   path_provider: ^1.6.9
+  string_validator: ^0.1.4
+
   flutter:
     sdk: flutter
 

@@ -5,6 +5,7 @@ import 'package:flutter_video_editor/script_builders/base_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/drawtext_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/watermark_script_builder.dart';
 import 'package:flutter_video_editor/filters/watermark_filter.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 
 class SimpleScriptBuilder implements BaseScriptBuilder {
   final String videoPath;
@@ -16,6 +17,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
   final VideoCodec codec;
   final int outputRate;
   final int crf;
+  final VideoInfo info;
   final Preset preset;
   final List<DrawTextFilter> textFilters;
 
@@ -29,6 +31,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
     this.codec,
     this.outputRate,
     this.crf,
+    this.info,
     this.preset,
     this.textFilters = const [],
   });
@@ -42,7 +45,7 @@ class SimpleScriptBuilder implements BaseScriptBuilder {
     }
 
     final textFilterScript =
-        DrawTextScriptBuilder(textFilters, fontPath).build();
+        DrawTextScriptBuilder(textFilters, fontPath, videoInfo: info).build();
 
     final watermarkFilter = WatermarkScriptBuilder(
             watermark: watermark,

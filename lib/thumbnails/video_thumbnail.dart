@@ -1,6 +1,6 @@
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/thumbnails/thumbnail_format.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 
 class VideoThumbnail {
   final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();

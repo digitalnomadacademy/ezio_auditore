@@ -7,9 +7,10 @@ import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
 import 'package:flutter_video_editor/script_builders/combine_script_builder.dart';
 import 'package:flutter_video_editor/script_builders/simple_script_builder.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -53,6 +54,7 @@ class VideoEditor {
       String watermark = '',
       WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
       int crf = 27,
+      List<DrawTextFilter> textFilters = const [],
       Preset preset = Preset.defaultPreset}) async {
     if (videoPath.isEmpty || outputPath.isEmpty) {
       throw InvalidArgumentException(
@@ -62,12 +64,15 @@ class VideoEditor {
     final codecConfig = CodecConfig.fromOptions(codec, crf, preset);
 
     final fontPath = await setupFont();
+    var info = await VideoUtil().getVideoInfo(videoPath);
 
     final script = _buildScript(
         videoPath: videoPath,
         outputPath: outputPath,
         fontPath: fontPath,
+        textFilters: textFilters,
         codecConfig: codecConfig,
+        info: info,
         watermark: watermark,
         watermarkPosition: watermarkPosition,
         outputRate: 30);
@@ -87,6 +92,7 @@ class VideoEditor {
       @required String outputPath,
       String watermark = '',
       WatermarkPosition watermarkPosition,
+      List<DrawTextFilter> textFilters = const [],
       int crf = 27,
       Preset preset = Preset.defaultPreset}) async {
     if (videoPaths.length < 2 || outputPath.isEmpty) {
@@ -109,6 +115,10 @@ class VideoEditor {
       }
     }
 
+    final fontPath = await setupFont();
+    // Currently we base the video scale based on max available resolution among video paths
+    final maxVideoInfo = await _getMaxVideoInfo(videoPaths);
+
     //Our codecs match, execute script
     final script = _buildScript(
       videoPaths: videoPaths,
@@ -116,6 +126,9 @@ class VideoEditor {
       outputPath: outputPath,
       codec: firstCodec,
       watermark: watermark,
+      textFilters: textFilters,
+      info: maxVideoInfo,
+      fontPath: fontPath,
       watermarkPosition: watermarkPosition,
       crf: crf,
       preset: preset,
@@ -137,11 +150,13 @@ class VideoEditor {
     List<String> videoPaths,
     String outputPath,
     String fontPath,
+    VideoInfo info,
     CodecConfig codecConfig,
     String watermark = '',
     WatermarkPosition watermarkPosition = WatermarkPosition.bottomRight,
     VideoCodec codec,
     int outputRate,
+    List<DrawTextFilter> textFilters,
     int crf,
     Preset preset,
   }) {
@@ -154,6 +169,8 @@ class VideoEditor {
         codecConfig: codecConfig,
         watermark: watermark,
         watermarkPosition: watermarkPosition,
+        info: info,
+        textFilters: textFilters,
         codec: codec,
         outputRate: outputRate,
         crf: crf,
@@ -172,8 +189,22 @@ class VideoEditor {
       watermarkPosition: watermarkPosition,
       codec: codec,
       outputRate: outputRate,
+      textFilters: textFilters,
       crf: crf,
+      info: info,
       preset: preset,
     ).build();
+  }
+
+  Future<VideoInfo> _getMaxVideoInfo(List<String> videoPaths) async {
+    List<VideoInfo> videoInfos = List();
+    for (var path in videoPaths) {
+      videoInfos.add(await VideoUtil().getVideoInfo(path));
+    }
+
+    final videoInfo = videoInfos.reduce((infoOne, otherInfo) =>
+        infoOne.totalPixels > otherInfo.totalPixels ? infoOne : otherInfo);
+
+    return videoInfo;
   }
 }

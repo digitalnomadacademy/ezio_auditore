@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:example/pages/example_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_video_editor/video_util.dart';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
+import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/flutter_video_editor.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:gallery_saver/gallery_saver.dart';
@@ -72,10 +74,36 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                 //Watermark
                 final watermark = await getWaterMarkPath();
 
+                //Text
+                final List<DrawTextFilter> textFilters = [
+                  DrawTextFilter(
+                    text:
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 1,
+                    endTimeInSeconds: 5,
+                    textPosition: VideoTextPosition.top,
+                  ),
+                  DrawTextFilter(
+                    text:
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 6,
+                    endTimeInSeconds: 10,
+                    textPosition: VideoTextPosition.bottom,
+                  ),
+                ];
+
                 await videoEditor.combineVideos(
                     videoPaths: [video_1_path, video_2_path],
                     outputPath: tempPath,
                     watermark: watermark,
+                    textFilters: textFilters,
+                    watermarkPosition: WatermarkPosition.topLeft,
                     preset: Preset.superFast);
                 await GallerySaver.saveVideo(tempPath,
                         albumName: "FlutterVideoEditor")
