@@ -17,7 +17,8 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
   String build() {
     var filter = '';
 
-    final boxHeight = (videoInfo.rotatedHeight / 4).ceil();
+    final boxHeight = ((videoInfo?.rotatedHeight ?? 0) / 4).ceil();
+    print("BOX HEIGHT: $boxHeight");
 
     // Todo: Add support for colors passed in textFilters for ffmpeg
     // drawtext and drawbox are two different filters and must be comma separated

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:example/pages/example_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_video_editor/filters/drawtext_filter.dart';
+import 'package:flutter_video_editor/filters/watermark_filter.dart';
 import 'package:flutter_video_editor/utils/video_util.dart';
 import 'package:flutter_video_editor/flutter_video_editor.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
@@ -72,10 +74,35 @@ class _ConcatVideosPageState extends State<ConcatVideosPage> {
                 //Watermark
                 final watermark = await getWaterMarkPath();
 
+                //Text
+                final List<DrawTextFilter> textFilters = [
+                  DrawTextFilter(
+                    text:
+                        "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ae",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 1,
+                    endTimeInSeconds: 5,
+                    textPosition: VideoTextPosition.bottom,
+                  ),
+                  DrawTextFilter(
+                    text: "The other text",
+                    boxColor: Colors.black,
+                    fontSize: 45,
+                    hasBox: true,
+                    startTimeInSeconds: 6,
+                    endTimeInSeconds: 10,
+                    textPosition: VideoTextPosition.bottom,
+                  ),
+                ];
+
                 await videoEditor.combineVideos(
                     videoPaths: [video_1_path, video_2_path],
                     outputPath: tempPath,
                     watermark: watermark,
+                    textFilters: textFilters,
+                    watermarkPosition: WatermarkPosition.topLeft,
                     preset: Preset.superFast);
                 await GallerySaver.saveVideo(tempPath,
                         albumName: "FlutterVideoEditor")
