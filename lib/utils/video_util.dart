@@ -46,6 +46,7 @@ class VideoInfo {
     debugPrint(map.toString());
 
     var frameRate = 0.0;
+    final rotation = map['streams'][0]['metadata']['rotate'];
 
     try {
       frameRate = double.parse(map['streams'][0]['realFrameRate']);
@@ -56,8 +57,7 @@ class VideoInfo {
       duration: map['duration'] as int,
       width: map['streams'][0]['width'] as int,
       height: map['streams'][0]['height'] as int,
-      isVertical:
-          map['streams'][0]['metadata']['rotate'] == "90" ? true : false,
+      isVertical: (rotation == "90" || rotation == "270") ? true : false,
       bitrate: map['streams'][0]['bitrate'] as int,
       codec:
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
