@@ -14,7 +14,7 @@ class VideoThumbnail {
       String outputPath}) async {
     // Get total duration of video
     final videoInfo = await _videoUtil.getVideoInfo(videoPath);
-    final duration = _formattedDuration((videoInfo.duration));
+    final duration = _formattedDuration((videoInfo.duration / 2000).floor());
 
     final filename = '${DateTime.now().toIso8601String()}.${format.name}';
     final thumbnailPath = '$outputPath$filename';
