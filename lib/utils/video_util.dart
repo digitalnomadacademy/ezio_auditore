@@ -46,7 +46,8 @@ class VideoInfo {
     debugPrint(map.toString());
 
     var frameRate = 0.0;
-    final rotation = map['streams'][0]['tags']['rotate'];
+    final width = map['streams'][0]['width'] as int;
+    final height = map['streams'][0]['height'] as int;
 
     try {
       frameRate = double.parse(map['streams'][0]['realFrameRate']);
@@ -54,10 +55,10 @@ class VideoInfo {
 
     return VideoInfo(
       fileSize: size / 1000.0,
-      duration: map['duration'] as int,
-      width: map['streams'][0]['width'] as int,
-      height: map['streams'][0]['height'] as int,
-      isVertical: (rotation == "90" || rotation == "270") ? true : false,
+      duration: double.parse(map['format']['duration'] as String).floor(),
+      width: width,
+      height: height,
+      isVertical: (height > width) ? true : false,
       bitrate: map['streams'][0]['bitrate'] as int,
       codec:
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
