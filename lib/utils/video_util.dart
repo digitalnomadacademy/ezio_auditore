@@ -12,7 +12,7 @@ class VideoUtil {
     final info = await _flutterFFprobe.getMediaInformation(path);
     final tmpFile = File(path);
     var size = await tmpFile.length();
-    return VideoInfo.fromMap(info, size);
+    return VideoInfo.fromMap(info.getAllProperties(), size);
   }
 }
 
@@ -46,7 +46,7 @@ class VideoInfo {
     debugPrint(map.toString());
 
     var frameRate = 0.0;
-    final rotation = map['streams'][0]['metadata']['rotate'];
+    final rotation = map['streams'][0]['tags']['rotate'];
 
     try {
       frameRate = double.parse(map['streams'][0]['realFrameRate']);

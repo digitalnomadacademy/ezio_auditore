@@ -47,7 +47,9 @@ class _ExamplePageState extends State<ExamplePage> {
             FlatButton(
               child: Text('Encode'),
               onPressed: () async {
-                final videoEditor = VideoEditor();
+                final videoEditor = VideoEditor(onLog: (msg) {
+                  print("FROM EXAMPLE: $msg");
+                });
 
                 //Get temp file path
                 var tempDir = await getTemporaryDirectory();

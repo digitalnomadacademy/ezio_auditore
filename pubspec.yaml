@@ -8,7 +8,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  flutter_ffmpeg: ^0.2.10
+  flutter_ffmpeg: ^0.3.0
   camera: ^0.5.8+2
   path_provider: ^1.6.9
   string_validator: ^0.1.4

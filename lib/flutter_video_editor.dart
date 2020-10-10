@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:flutter_ffmpeg/log.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
@@ -22,8 +23,18 @@ enum VideoOutputState {
 
 /// VideoEditor class which will be used by our VideoViewer as well.
 class VideoEditor {
+  final Function(String) onLog;
   final FlutterFFmpeg _flutterFFmpeg = FlutterFFmpeg();
   final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
+
+  VideoEditor({this.onLog}) {
+    _flutterFFmpegConfig.enableLogCallback(this.logCallback);
+  }
+
+  void logCallback(Log log) {
+    final msg = "${log.executionId}:${log.message}";
+    (onLog != null) ? onLog(msg) : print(msg);
+  }
 
   Future<String> setupFont() async {
     final filename = 'font.ttf';
