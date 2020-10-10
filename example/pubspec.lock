@@ -96,7 +96,7 @@ packages:
       name: flutter_ffmpeg
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.2.10"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -115,7 +115,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.3"
+    version: "0.0.3+1"
   gallery_saver:
     dependency: "direct main"
     description:

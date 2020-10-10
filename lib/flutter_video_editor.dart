@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
-import 'package:flutter_ffmpeg/log.dart';
 import 'package:flutter_video_editor/codecs.dart';
 import 'package:flutter_video_editor/constants/presets.dart';
 import 'package:flutter_video_editor/exceptions.dart';
@@ -28,12 +27,12 @@ class VideoEditor {
   final FlutterFFmpegConfig _flutterFFmpegConfig = FlutterFFmpegConfig();
 
   VideoEditor({this.onLog}) {
-    _flutterFFmpegConfig.enableLogCallback(this.logCallback);
+    _flutterFFmpegConfig.enableLogCallback(logCallback);
   }
 
-  void logCallback(Log log) {
-    final msg = "${log.executionId}:${log.message}";
-    (onLog != null) ? onLog(msg) : print(msg);
+  void logCallback(int level, String msg) {
+    final logMsg = "$level:$msg";
+    (onLog != null) ? onLog(logMsg) : print(logMsg);
   }
 
   Future<String> setupFont() async {

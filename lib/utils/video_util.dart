@@ -12,7 +12,7 @@ class VideoUtil {
     final info = await _flutterFFprobe.getMediaInformation(path);
     final tmpFile = File(path);
     var size = await tmpFile.length();
-    return VideoInfo.fromMap(info.getAllProperties(), size);
+    return VideoInfo.fromMap(info, size);
   }
 }
 
@@ -46,8 +46,7 @@ class VideoInfo {
     debugPrint(map.toString());
 
     var frameRate = 0.0;
-    final width = map['streams'][0]['width'] as int;
-    final height = map['streams'][0]['height'] as int;
+    final rotation = map['streams'][0]['metadata']['rotate'];
 
     try {
       frameRate = double.parse(map['streams'][0]['realFrameRate']);
@@ -55,10 +54,10 @@ class VideoInfo {
 
     return VideoInfo(
       fileSize: size / 1000.0,
-      duration: double.parse(map['format']['duration'] as String).floor(),
-      width: width,
-      height: height,
-      isVertical: (height > width) ? true : false,
+      duration: map['duration'] as int,
+      width: map['streams'][0]['width'] as int,
+      height: map['streams'][0]['height'] as int,
+      isVertical: (rotation == "90" || rotation == "270") ? true : false,
       bitrate: map['streams'][0]['bitrate'] as int,
       codec:
           map['streams'][0]['codec'].toString().toLowerCase().contains('h264')
