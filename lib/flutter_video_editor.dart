@@ -209,7 +209,8 @@ class VideoEditor {
   Future<VideoInfo> _getMaxVideoInfo(List<String> videoPaths) async {
     List<VideoInfo> videoInfos = List();
     for (var path in videoPaths) {
-      videoInfos.add(await VideoUtil().getVideoInfo(path));
+      final info = await VideoUtil().getVideoInfo(path);
+      videoInfos.add(info);
     }
 
     final videoInfo = videoInfos.reduce((infoOne, otherInfo) =>
