@@ -60,7 +60,8 @@ class _ExamplePageState extends State<ExamplePage> {
                 //Text Filters
                 final textFilters = [
                   DrawTextFilter(
-                    text: "This is a text",
+                    text:
+                        "This is a text that can spread to two lines possibly",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,

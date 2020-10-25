@@ -39,17 +39,22 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
       final numOfLines = processedString.tokens.length;
       final isBottomPosition =
           textFilter.textPosition == VideoTextPosition.bottom;
-      final maxMargin =
-          isBottomPosition ? (numOfLines * _textMargin) : _textMargin;
+      final maxMargin = isBottomPosition ? (numOfLines * 155) : _textMargin;
       final marginOperator = isBottomPosition ? "-" : "+";
 
       for (var j = 0; j < numOfLines; j++) {
-        final margin = isBottomPosition
-            ? (maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 30 : 0))))
+        var margin = isBottomPosition
+            ? (maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 50 : 0))))
             : (maxMargin + (j * (_textMargin + ((numOfLines < 4) ? 30 : 0))));
 
         var textSeparator = ", ";
         if (j == numOfLines - 1) textSeparator = '';
+
+        if (numOfLines == 1) {
+          //In case of single liners add in more bottom padding
+          //Todo: Make this dynamic as well
+          margin = _textMargin + 140;
+        }
 
         filter +=
             "drawtext=fontfile='$fontPath':fontsize=${processedString.scaledFontSize}:fontcolor=white:${textFilter.textPosition.textPosition}$marginOperator$margin:text='${processedString.tokens[j]}':enable='between(t\\,${textFilter.startTimeInSeconds}\\,${textFilter.endTimeInSeconds})'$textSeparator";
