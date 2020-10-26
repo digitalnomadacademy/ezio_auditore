@@ -14,7 +14,8 @@ class TextUtil {
 
   static const FONT_SIZE_REF = (24 * 3);
   static const WORDS_IN_LINE = 4;
-  static const CHARS_IN_LINE = 27;
+  static const CHARS_IN_LINE = 22;
+  static const CHARS_BREAKER_LIMIT = 27;
   static const MAX_LINES = 6;
 
   ProcessedString tokenize() {
@@ -31,10 +32,19 @@ class TextUtil {
       final scaledFont = ((1 / ratio) * FONT_SIZE_REF).floor();
 
       return ProcessedString(
-          _baseTokens((ratio * CHARS_IN_LINE).floor()), scaledFont);
+          _baseTokens((ratio * CHARS_BREAKER_LIMIT).floor()), scaledFont);
     } else {
       // Split normal text into tokens
-      return ProcessedString(_baseTokens(CHARS_IN_LINE), FONT_SIZE_REF.floor());
+      var tokens = _baseTokens(CHARS_BREAKER_LIMIT);
+      var fontSize = FONT_SIZE_REF;
+
+      if (tokens.length > 4) {
+        // We cant be using same font size. It needs to be scaled down
+        tokens = _baseTokens((1.15 * CHARS_BREAKER_LIMIT).floor());
+        fontSize = (fontSize * 0.85).floor();
+      }
+
+      return ProcessedString(tokens, fontSize);
     }
   }
 

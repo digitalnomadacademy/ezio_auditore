@@ -39,13 +39,15 @@ class DrawTextScriptBuilder extends BaseScriptBuilder {
       final numOfLines = processedString.tokens.length;
       final isBottomPosition =
           textFilter.textPosition == VideoTextPosition.bottom;
-      final maxMargin = isBottomPosition ? (numOfLines * 155) : _textMargin;
+      final maxMargin = isBottomPosition ? (310) : _textMargin;
       final marginOperator = isBottomPosition ? "-" : "+";
+
+      print("SCALED_FONTSIZE: ${processedString.scaledFontSize}");
 
       for (var j = 0; j < numOfLines; j++) {
         var margin = isBottomPosition
-            ? (maxMargin - (j * (_textMargin + ((numOfLines < 4) ? 50 : 0))))
-            : (maxMargin + (j * (_textMargin + ((numOfLines < 4) ? 30 : 0))));
+            ? (maxMargin - (j * (_textMargin + ((numOfLines <= 4) ? 30 : 0))))
+            : (maxMargin + (j * (_textMargin + ((numOfLines <= 4) ? 30 : 0))));
 
         var textSeparator = ", ";
         if (j == numOfLines - 1) textSeparator = '';

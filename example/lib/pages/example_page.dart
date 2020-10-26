@@ -60,14 +60,13 @@ class _ExamplePageState extends State<ExamplePage> {
                 //Text Filters
                 final textFilters = [
                   DrawTextFilter(
-                    text:
-                        "This is a text that can spread to two lines possibly",
+                    text: "This is a test string",
                     boxColor: Colors.black,
                     fontSize: 45,
                     hasBox: true,
                     startTimeInSeconds: 1,
                     endTimeInSeconds: 3,
-                    textPosition: VideoTextPosition.top,
+                    textPosition: VideoTextPosition.bottom,
                   )
                 ];
 
