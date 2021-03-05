@@ -174,7 +174,7 @@ class _CameraExampleState extends State<CameraExample>
 
     try {
       videoPath = filePath;
-      await controller.startVideoRecording(filePath);
+      await controller.startVideoRecording();
       print("Recording started");
       setState(() {});
     } catch (e) {

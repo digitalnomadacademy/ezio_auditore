@@ -93,8 +93,9 @@ class VideoRecorderController extends CameraController {
 
   /// Function to record videos. Requires a file path. Returns a future with
   /// recorded video in specified file path
-  Future<void> startVideoRecording(String filePath) async {
-    return super.startVideoRecording(filePath);
+
+  Future<void> startVideoRecording() async {
+    return super.startVideoRecording();
   }
 
   /// Function to pause video recording. Returns null if no video is being recorded
@@ -114,7 +115,7 @@ class VideoRecorderController extends CameraController {
   }
 
   /// Function to stop video recording. Returns null if no video is being recorded
-  Future<void> stopVideoRecording() async {
+  Future<XFile> stopVideoRecording() async {
     if (!this.isRecordingVideo) {
       return null;
     }
